@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  lidarr:
+    image: linuxserver/lidarr:latest
+    container_name: lidarr
+    hostname: lidarr
+    restart: unless-stopped
+    volumes:
+      - ../Data/config:/config
+      - ../Data/music:/music
+      - ../Data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.lidarr.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.lidarr.entrypoints=web-secure"
+      - "traefik.http.routers.lidarr.middlewares=default-headers@file"
+      - "traefik.http.routers.lidarr.service=lidarr"
+      - "traefik.http.routers.lidarr.tls=true"
+      - "traefik.http.services.lidarr.loadbalancer.server.port=8686" # Proxied Port
